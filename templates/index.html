@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #0779e4 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        .main-content {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .card {
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            width: 48%;
+        }
+        h2, h3 {
+            color: #333;
+        }
+        form {
+            margin-top: 20px;
+        }
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        form button {
+            background: #0779e4;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .products {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .product {
+            background: #fff;
+            padding: 20px;
+            margin: 10px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            width: 30%;
+            box-sizing: border-box;
+        }
+        .product img {
+            width: 100%;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .product h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .product p {
+            color: #666;
+        }
+        .product button {
+            background: #0779e4;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+        }
+    </style>
+    <script>
+        function sendVerificationCode() {
+            const phoneNumber = document.getElementById('phonenumber').value;
+            if (phoneNumber) {
+                fetch('/send-verification-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ phonenumber: phoneNumber })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('verification-section').style.display = 'block';
+                    } else {
+                        alert('发送验证码失败，请重试。');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            } else {
+                alert('请输入电话号码。');
+            }
+        }
+
+        function toggleVerificationSection() {
+            const phoneNumber = document.getElementById('phonenumber').value;
+            document.getElementById('verification-section').style.display = phoneNumber ? 'block' : 'none';
+        }
+    </script>
+</head>
+<body>
+    <header class="container">
+        <h1>Welcome To Our Webpage</h1>
+    </header>
+    <div class="container">
+        <div class="main-content">
+            <div class="card">
+                <h2>首頁</h2>
+                <h3>註冊</h3>
+                <form action="/signup" method="POST">
+                    <label for="nickname">Name</label>
+                    <input type="text" id="nickname" name="nickname"><br>
+
+                    <label for="email">Email</label>
+                    <input type="text" id="email" name="email"><br>
+
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password"><br>
+
+                    <label for="phonenumber">Phone Number</label>
+                    <input type="text" id="phonenumber" name="phonenumber" oninput="toggleVerificationSection()">
+                    <button type="button" onclick="sendVerificationCode()">发送验证码</button><br>
+
+                    <div id="verification-section" style="display:none;">
+                        <label for="verification">Verification Code</label>
+                        <input type="text" id="verification" name="verification"><br>
+                    </div>
+
+                    <button type="submit">Sign Up</button>
+                </form>
+                <a href="/signin">登入</a>
+            </div>
+            <div class="card">
+                <h2>產品展示</h2>
+                <div class="products">
+                    <div class="product">
+                        <img src="https://via.placeholder.com/150" alt="Product 1">
+                        <h4>產品名稱 1</h4>
+                        <p>產品描述 1</p>
+                        <button>购买</button>
+                    </div>
+                    <div class="product">
+                        <img src="https://via.placeholder.com/150" alt="Product 2">
+                        <h4>產品名稱 2</h4>
+                        <p>產品描述 2</p>
+                        <button>购买</button>
+                    </div>
+                    <div class="product">
+                        <img src="https://via.placeholder.com/150" alt="Product 3">
+                        <h4>產品名稱 3</h4>
+                        <p>產品描述 3</p>
+                        <button>购买</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

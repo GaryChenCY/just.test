@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #0779e4 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        .card {
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            width: 50%;
+            margin: 50px auto;
+        }
+        h2, h3 {
+            color: #333;
+        }
+        form {
+            margin-top: 20px;
+        }
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        form input, form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        form button {
+            background: #0779e4;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .product-list {
+            margin-top: 20px;
+        }
+        .product-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .product-list th, .product-list td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .product-list th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <header class="container">
+        <h1>Admin Page</h1>
+    </header>
+    <div class="card">
+        <h2>新增/編輯產品</h2>
+        <form action="/admin/add_product" method="POST" enctype="multipart/form-data">
+            <label for="product_name">產品名稱</label>
+            <input type="text" id="product_name" name="product_name"><br>
+
+            <label for="product_description">產品描述</label>
+            <input type="text" id="product_description" name="product_description"><br>
+
+            <label for="product_price">價格</label>
+            <input type="number" id="product_price" name="product_price" step="0.01"><br>
+
+            <label for="product_image">圖片</label>
+            <input type="file" id="product_image" name="product_image"><br>
+
+            <button type="submit">新增產品</button>
+        </form>
+
+        <h2>產品列表</h2>
+        <div class="product-list">
+            <table>
+                <thead>
+                    <tr>
+                        <th>產品名稱</th>
+                        <th>描述</th>
+                        <th>價格</th>
+                        <th>圖片</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="product-list-body">
+                    <!-- 這裡會動態生成產品列表 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/admin/products')
+                .then(response => response.json())
+                .then(data => {
+                    const productListBody = document.getElementById('product-list-body');
+                    productListBody.innerHTML = '';  // 清空之前的内容
+                    data.products.forEach(product => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${product.name}</td>
+                            <td>${product.description}</td>
+                            <td>${product.price}</td>
+                            <td><img src="${product.image}" alt="${product.name}" style="width: 50px; height: 50px;"></td>
+                            <td>
+                                <button onclick="deleteProduct(${product.id})">删除</button>
+                            </td>
+                        `;
+                        productListBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        function deleteProduct(productId) {
+            fetch(`/admin/delete_product/${productId}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('删除产品失败，请重试。');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
